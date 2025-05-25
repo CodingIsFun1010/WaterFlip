@@ -1,27 +1,63 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Water Bottle Flip Game</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <div class="container">
-    <h1>Water Bottle Flip</h1>
-    <div class="bottle-container">
-      <div id="bottle" class="bottle default"></div>
-    </div>
-    <button id="flipBtn">Flip the Bottle</button>
-    <p id="result"></p>
-    <p>Coins: <span id="coins">0</span></p>
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: #f0f4f8;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
 
-    <h2>Upgrades</h2>
-    <div class="shop">
-      <button id="buyGreen">Buy Green Bottle (250 coins)</button>
-      <button id="buyNeon">Buy Neon Blue Bottle (500 coins)</button>
-    </div>
-  </div>
-  <script src="script.js"></script>
-</body>
-</html>
+.container {
+  text-align: center;
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+.bottle-container {
+  height: 150px;
+  margin: 20px auto;
+}
+
+.bottle {
+  width: 40px;
+  height: 100px;
+  margin: 0 auto;
+  border-radius: 10px;
+  transition: transform 0.6s ease;
+}
+
+.default {
+  background-color: gray;
+}
+
+.green {
+  background-color: green;
+}
+
+.neon {
+  background: cyan;
+  box-shadow: 0 0 10px cyan;
+}
+
+button {
+  padding: 10px 20px;
+  margin: 10px;
+  border: none;
+  border-radius: 6px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+#result {
+  font-weight: bold;
+  font-size: 18px;
+  margin: 10px 0;
+}
