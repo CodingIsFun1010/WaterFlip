@@ -1,0 +1,20 @@
+import base64
+from PIL import Image
+from io import BytesIO
+import matplotlib.pyplot as plt
+
+# Base64 image string (truncated for brevity — you’ll need the full string)
+img_base64 = """
+/9j/4AAQSkZJRgABAQAAAQABAAD/... (your full base64 string here)
+"""
+
+# Decode and save the image
+img_data = base64.b64decode(img_base64)
+image = Image.open(BytesIO(img_data))
+image.save("bottle.png")
+
+# Display the image
+plt.imshow(image)
+plt.axis('off')
+plt.title("Bottle Image")
+plt.show()
