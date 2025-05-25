@@ -10,6 +10,7 @@ let bottleType = {
 };
 
 flipBtn.addEventListener("click", () => {
+  // Flip animation
   bottle.style.transform = "rotateX(360deg)";
   setTimeout(() => {
     bottle.style.transform = "rotateX(0deg)";
@@ -30,11 +31,8 @@ flipBtn.addEventListener("click", () => {
 document.getElementById("buyGreen").addEventListener("click", () => {
   if (coins >= 250) {
     coins -= 250;
-    bottle.className = "bottle green";
-    bottleType = {
-      type: "green",
-      chance: 0.7, // 70%
-    };
+    bottle.className = "bottle-image green";
+    bottleType = { type: "green", chance: 0.7 };
     coinsDisplay.textContent = coins;
     resultDisplay.textContent = "Upgraded to Green Bottle!";
   } else {
@@ -45,11 +43,8 @@ document.getElementById("buyGreen").addEventListener("click", () => {
 document.getElementById("buyNeon").addEventListener("click", () => {
   if (coins >= 500) {
     coins -= 500;
-    bottle.className = "bottle neon";
-    bottleType = {
-      type: "neon",
-      chance: 0.9, // 90%
-    };
+    bottle.className = "bottle-image neon";
+    bottleType = { type: "neon", chance: 0.9 };
     coinsDisplay.textContent = coins;
     resultDisplay.textContent = "Upgraded to Neon Blue Bottle!";
   } else {
