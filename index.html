@@ -1,27 +1,238 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Water Bottle Flip Game</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Water Bottle Flip Game</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap');
+
+  body {
+    background: #121212;
+    color: #eee;
+    font-family: 'Montserrat', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+    user-select: none;
+  }
+
+  h1 {
+    margin-bottom: 1rem;
+  }
+
+  .game-container {
+    text-align: center;
+    max-width: 400px;
+  }
+
+  #bottle {
+    width: 150px;
+    height: 350px;
+    margin: 0 auto 1rem;
+    background: linear-gradient(135deg, #888, #ccc);
+    border-radius: 30px 30px 15px 15px;
+    position: relative;
+    box-shadow: 0 0 20px #888;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    transform-origin: center bottom;
+  }
+
+  /* Neon color styles for bottles */
+  .bottle-default {
+    background: linear-gradient(135deg, #bbb, #eee);
+    box-shadow: 0 0 20px #bbb;
+  }
+
+  .bottle-neon-green {
+    background: linear-gradient(135deg, #00ff99, #00cc66);
+    box-shadow: 0 0 25px #00ff99;
+  }
+
+  .bottle-neon-blue {
+    background: linear-gradient(135deg, #00ccff, #0066cc);
+    box-shadow: 0 0 30px #00ccff;
+  }
+
+  #coins {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  #flipResult {
+    font-size: 1.3rem;
+    min-height: 1.5rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+  }
+
+  button {
+    font-size: 1rem;
+    padding: 0.6rem 1.2rem;
+    margin: 0.4rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: background 0.3s ease;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .buy-green {
+    background: #00cc66;
+    color: #fff;
+  }
+
+  .buy-blue {
+    background: #0066cc;
+    color: #fff;
+  }
+
+  #bottle:hover {
+    filter: brightness(1.2);
+  }
+</style>
 </head>
 <body>
-  <div class="container">
-    <h1>Water Bottle Flip</h1>
-    <div class="bottle-container">
-      <div id="bottle" class="bottle default"></div>
-    </div>
-    <button id="flipBtn">Flip the Bottle</button>
-    <p id="result"></p>
-    <p>Coins: <span id="coins">0</span></p>
-
-    <h2>Upgrades</h2>
-    <div class="shop">
-      <button id="buyGreen">Buy Green Bottle (250 coins)</button>
-      <button id="buyNeon">Buy Neon Blue Bottle (500 coins)</button>
+  <h1>Water Bottle Flip Game</h1>
+  <div class="game-container">
+    <div id="coins">Coins: 0</div>
+    <div id="bottle" class="bottle-default" title="Click to flip the bottle"></div>
+    <div id="flipResult"></div>
+    <div>
+      <button id="buyGreen" class="buy-green" title="Buy Neon Green Bottle (250 coins)">Buy Neon Green Bottle (250)</button>
+      <button id="buyBlue" class="buy-blue" title="Buy Neon Blue Bottle (500 coins)">Buy Neon Blue Bottle (500)</button>
     </div>
   </div>
-  <script src="script.js"></script>
+
+<script>
+  // Game state
+  let coins = 0;
+  let currentBottle = 'default'; // default, neonGreen, neonBlue
+  let flipping = false;
+
+  // Chances by bottle type
+  const chances = {
+    default: 0.5,
+    neonGreen: 0.7,
+    neonBlue: 0.9
+  };
+
+  // Costs
+  const costs = {
+    neonGreen: 250,
+    neonBlue: 500
+  };
+
+  // References to DOM elements
+  const coinsDisplay = document.getElementById('coins');
+  const bottle = document.getElementById('bottle');
+  const flipResult = document.getElementById('flipResult');
+  const buyGreenBtn = document.getElementById('buyGreen');
+  const buyBlueBtn = document.getElementById('buyBlue');
+
+  // Update coins UI and button states
+  function updateUI() {
+    coinsDisplay.textContent = `Coins: ${coins}`;
+    buyGreenBtn.disabled = coins < costs.neonGreen || currentBottle === 'neonGreen' || currentBottle === 'neonBlue';
+    buyBlueBtn.disabled = coins < costs.neonBlue || currentBottle === 'neonBlue';
+  }
+
+  // Change bottle style according to currentBottle
+  function updateBottleStyle() {
+    bottle.className = '';
+    if(currentBottle === 'default') {
+      bottle.classList.add('bottle-default');
+      bottle.title = "Click to flip the default bottle (50/50 chance)";
+    } else if(currentBottle === 'neonGreen') {
+      bottle.classList.add('bottle-neon-green');
+      bottle.title = "Click to flip the neon green bottle (70% chance)";
+    } else if(currentBottle === 'neonBlue') {
+      bottle.classList.add('bottle-neon-blue');
+      bottle.title = "Click to flip the neon blue bottle (90% chance)";
+    }
+  }
+
+  // Flip animation function (returns a Promise that resolves after animation)
+  function flipAnimation() {
+    return new Promise((resolve) => {
+      let rotation = 0;
+      const duration = 1500; // 1.5 seconds animation
+      const startTime = performance.now();
+
+      function animate(time) {
+        let elapsed = time - startTime;
+        let progress = Math.min(elapsed / duration, 1);
+
+        // Rotate bottle multiple times for effect
+        rotation = progress * 1440; // 4 full spins (360*4)
+        bottle.style.transform = `rotateX(${rotation}deg)`;
+
+        if(progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          bottle.style.transform = 'rotateX(0deg)'; // Reset rotation
+          resolve();
+        }
+      }
+      requestAnimationFrame(animate);
+    });
+  }
+
+  // Flip logic: determine if successful based on current bottle chance
+  function flipBottle() {
+    if(flipping) return; // prevent multiple flips
+    flipping = true;
+    flipResult.textContent = "Flipping...";
+    flipAnimation().then(() => {
+      let chance = chances[currentBottle];
+      let landed = Math.random() < chance;
+
+      if(landed) {
+        coins += 50;
+        flipResult.textContent = "You landed it! +50 coins 🎉";
+      } else {
+        flipResult.textContent = "Oops! You missed the flip 😞";
+      }
+      updateUI();
+      flipping = false;
+    });
+  }
+
+  // Buy bottles
+  buyGreenBtn.addEventListener('click', () => {
+    if(coins >= costs.neonGreen) {
+      coins -= costs.neonGreen;
+      currentBottle = 'neonGreen';
+      flipResult.textContent = "You bought the Neon Green bottle! Chance improved.";
+      updateBottleStyle();
+      updateUI();
+    }
+  });
+
+  buyBlueBtn.addEventListener('click', () => {
+    if(coins >= costs.neonBlue) {
+      coins -= costs.neonBlue;
+      currentBottle = 'neonBlue';
+      flipResult.textContent = "You bought the Neon Blue bottle! Chance greatly improved.";
+      updateBottleStyle();
+      updateUI();
+    }
+  });
+
+  // Bottle click event to flip
+  bottle.addEventListener('click', flipBottle);
+
+  // Initialize UI
+  updateUI();
+  updateBottleStyle();
+</script>
 </body>
 </html>
+
