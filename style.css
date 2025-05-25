@@ -17,29 +17,23 @@ body {
 }
 
 .bottle-container {
-  height: 150px;
+  height: 200px;
   margin: 20px auto;
+  position: relative;
 }
 
-.bottle {
-  width: 40px;
-  height: 100px;
-  margin: 0 auto;
-  border-radius: 10px;
+.bottle-image {
+  height: 150px;
   transition: transform 0.6s ease;
 }
 
-.default {
-  background-color: gray;
-}
-
 .green {
-  background-color: green;
+  filter: hue-rotate(100deg);
 }
 
 .neon {
-  background: cyan;
-  box-shadow: 0 0 10px cyan;
+  filter: hue-rotate(200deg) brightness(1.4);
+  box-shadow: 0 0 20px cyan;
 }
 
 button {
